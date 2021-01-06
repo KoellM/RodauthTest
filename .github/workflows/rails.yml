@@ -1,4 +1,4 @@
-name: RUN Rspec
+name: RUN Test
 on:
   pull_request:
     branches:
@@ -33,5 +33,7 @@ jobs:
         run: cp -v config/database.ci.yml config/database.yml
       - name: db create
         run: bundle exec rails db:create db:schema:load --trace
-      - name: run rspec
-        run: bundle exec rspec
+      - name: db migrate
+        run: bundle exec rails db:migrate
+      - name: run tests
+        run: bundle exec rails test
