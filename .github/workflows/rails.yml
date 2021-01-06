@@ -1,26 +1,37 @@
-name: Rails
-
-on: [push]
+name: RUN Rspec
+on:
+  pull_request:
+    branches:
+    - master
 
 jobs:
-
   build:
     runs-on: ubuntu-latest
 
     services:
       mysql:
         image: mysql:5.7
-
+        env:
+          MYSQL_USER: root
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
     container:
       image: ruby:2.7.2
+      env:
+        RAILS_ENV: test
 
     steps:
-    - uses: actions/checkout@v1
-    - name: Build and setup
-      run: |
-        gem install bundler --no-document -v $(grep "BUNDLED WITH" -1 Gemfile.lock | tail -n 1)
-        bundle install
-        bundle exec rails db:setup
-        bundle exec rails db:migrate
-    - name: Run Tests
-      run: bundle exec rails test
+      - uses: actions/checkout@v1
+      - uses: actions/cache@v1
+        with:
+          path: vendor/bundle
+          key: bundle-${{ hashFiles('**/Gemfile.lock') }}
+      - name: bundle install
+        run: |
+          gem install bundler
+          bundle install --path vendor/bundle --quiet --jobs 4 --retry 3
+      - name: set database.yml
+        run: cp -v config/database.ci.yml config/database.yml
+      - name: db create
+        run: bundle exec rails db:create db:schema:load --trace
+      - name: run rspec
+        run: bundle exec rspec
