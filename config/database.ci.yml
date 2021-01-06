@@ -9,6 +9,16 @@ default: &default
   username: root
   password:
 
+development:
+  <<: *default
+  database: RodauthMysql_development
+
 test:
   <<: *default
   database: RodauthMysql_test
+
+production:
+  <<: *default
+  database: RodauthMysql_production
+  username: RodauthMysql
+  password: <%= ENV['RODAUTHMYSQL_DATABASE_PASSWORD'] %>
