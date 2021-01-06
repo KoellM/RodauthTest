@@ -1,0 +1,29 @@
+name: Rails
+
+on: [push]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:5.7
+        options: --health-cmd "mysqladmin ping -h localhost" --health-interval 20s --health-timeout 10s --health-retries 10
+        env: 
+          MYSQL_ROOT_PASSWORD: ""
+
+    container:
+      image: ruby:2.7.2
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build and setup
+      run: |
+        gem install bundler --no-document -v $(grep "BUNDLED WITH" -1 Gemfile.lock | tail -n 1)
+        bundle install
+        bundle exec rails db:setup
+        bundle exec rails db:migrate
+    - name: Run Tests
+      run: bundle exec rails test
