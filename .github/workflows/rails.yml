@@ -1,8 +1,5 @@
 name: RUN Test
-on:
-  pull_request:
-    branches:
-    - master
+on: [push]
 
 jobs:
   build:
