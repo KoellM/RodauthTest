@@ -2,7 +2,38 @@ name: RUN Test
 on: [push]
 
 jobs:
-  build:
+  sqlite:
+    runs-on: ubuntu-latest
+    container: 
+      image: ruby:2.7.2
+    env:
+      RAILS_ENV: test
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: sqlite3
+        run: |
+          echo "gem 'sqlite3'" >> Gemfile
+          sed -i 's/mysql2/sqlite/g' config/initializers/sequel.rb
+          sed -i 's/mysql2/sqlite3/g' config/database.ci.yml
+          sed -i 's/post//g' config/database.ci.yml
+          sed -i 's/host//g' config/database.ci.yml
+          sed -i 's/RodauthMysql_test/RodauthMysql_test.sql/g' config/database.ci.yml
+      - name: bundle install
+        run: |
+          gem install bundler
+          bundle install --path vendor/bundle --quiet --jobs 4 --retry 3
+      - name: set database.yml
+        run: cp -v config/database.ci.yml config/database.yml
+      - name: db create
+        run: bundle exec rails db:create db:schema:load --trace
+      - name: db migrate
+        run: bundle exec rails db:migrate
+      - name: run tests
+        run: bundle exec rails test
+
+          
+  mysql:
     runs-on: ubuntu-latest
 
     services:
