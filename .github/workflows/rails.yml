@@ -1,26 +1,60 @@
-name: Rails
-
+name: RUN Test
 on: [push]
 
 jobs:
+  sqlite:
+    runs-on: ubuntu-latest
+    container: 
+      image: ruby:2.7.2
+    env:
+      RAILS_ENV: test
 
-  build:
+    steps:
+      - uses: actions/checkout@v1
+      - name: sqlite3
+        run: echo "gem 'sqlite3'" >> Gemfile
+      - run: sed -i 's/mysql2/sqlite/g' config/initializers/sequel.rb
+      - run: sed -i 's/mysql2/sqlite3/g' config/database.ci.yml
+      - run: sed -i 's/RodauthMysql_test/RodauthMysql_test.sql/g' config/database.ci.yml
+      - name: bundle install
+        run: |
+          gem install bundler
+          bundle install
+      - name: set database.yml
+        run: cp -v config/database.ci.yml config/database.yml
+      - name: db create
+        run: bundle exec rails db:create --trace
+      - name: db migrate
+        run: bundle exec rails db:migrate
+      - name: run tests
+        run: bundle exec rails test
+
+          
+  mysql:
     runs-on: ubuntu-latest
 
     services:
       mysql:
         image: mysql:5.7
-
+        env:
+          MYSQL_USER: root
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
     container:
       image: ruby:2.7.2
+      env:
+        RAILS_ENV: test
 
     steps:
-    - uses: actions/checkout@v1
-    - name: Build and setup
-      run: |
-        gem install bundler --no-document -v $(grep "BUNDLED WITH" -1 Gemfile.lock | tail -n 1)
-        bundle install
-        bundle exec rails db:setup
-        bundle exec rails db:migrate
-    - name: Run Tests
-      run: bundle exec rails test
+      - uses: actions/checkout@v1
+      - name: bundle install
+        run: |
+          gem install bundler
+          bundle install
+      - name: set database.yml
+        run: cp -v config/database.ci.yml config/database.yml
+      - name: db create
+        run: bundle exec rails db:create --trace
+      - name: db migrate
+        run: bundle exec rails db:migrate
+      - name: run tests
+        run: bundle exec rails test
