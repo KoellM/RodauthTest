@@ -57,7 +57,7 @@ jobs:
       - name: set database.yml
         run: cp -v config/database.ci.yml config/database.yml
       - name: db create
-        run: bundle exec rails db:create db:schema:load --trace
+        run: bundle exec rails db:create --trace
       - name: db migrate
         run: bundle exec rails db:migrate
       - name: run tests
