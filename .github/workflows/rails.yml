@@ -19,7 +19,7 @@ jobs:
       - name: bundle install
         run: |
           gem install bundler
-          bundle install --path vendor/bundle --quiet --jobs 4 --retry 3
+          bundle install
       - name: set database.yml
         run: cp -v config/database.ci.yml config/database.yml
       - name: db create
