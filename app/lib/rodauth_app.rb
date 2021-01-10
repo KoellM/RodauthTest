@@ -1,11 +1,8 @@
 class RodauthApp < Rodauth::Rails::App
   configure do
     # List of authentication features that are loaded.
-    enable :create_account, :verify_account, :verify_account_grace_period,
-      :login, :logout, :remember,
-      :reset_password, :change_password, :change_password_notify,
-      :change_login, :verify_login_change,
-      :close_account
+    enable :create_account,
+      :login, :logout, :remember
 
     # See the Rodauth documentation for the list of available config options:
     # http://rodauth.jeremyevans.net/documentation.html
@@ -22,13 +19,13 @@ class RodauthApp < Rodauth::Rails::App
     account_status_column :status
     account_unverified_status_value "unverified"
     account_open_status_value "verified"
-    account_closed_status_value "closed"
+    # account_closed_status_value "closed"
 
     # Store password hash in a column instead of a separate table.
     # account_password_hash_column :password_digest
 
     # Set password when creating account instead of when verifying.
-    verify_account_set_password? false
+    # verify_account_set_password? false
 
     # Redirect back to originally requested location after authentication.
     # login_return_to_requested_location? true
@@ -102,7 +99,7 @@ class RodauthApp < Rodauth::Rails::App
     # after_login { remember_login if param_or_nil("remember") }
 
     # Extend user's remember period when remembered via a cookie
-    extend_remember_deadline? true
+    # extend_remember_deadline? true
 
     # ==> Hooks
     # Validate custom fields in the create account form.
@@ -125,10 +122,10 @@ class RodauthApp < Rodauth::Rails::App
     logout_redirect "/"
 
     # Redirect to wherever login redirects to after account verification.
-    verify_account_redirect { login_redirect }
+    # verify_account_redirect { login_redirect }
 
     # Redirect to login page after password reset.
-    reset_password_redirect { login_path }
+    # reset_password_redirect { login_path }
 
     # ==> Deadlines
     # Change default deadlines for some actions.

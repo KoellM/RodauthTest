@@ -11,6 +11,7 @@ class RodauthTest < ActionDispatch::IntegrationTest
     fill_in('login', with: 'test@example.com')
     fill_in('password', with: 'example')
     fill_in('password-confirm', with: 'example')
+    fill_in('login-confirm', with: 'test@example.com')
     click_button('Create Account')
 
     assert page.has_text?('test@example.com')
@@ -23,7 +24,7 @@ class RodauthTest < ActionDispatch::IntegrationTest
     rodauth.new_account('test@example.com')
     rodauth.save_account
     rodauth.set_password('example')
-    rodauth.verify_account
+    # rodauth.verify_account
 
     visit rodauth.login_path
     fill_in('login', with: 'test@example.com')
